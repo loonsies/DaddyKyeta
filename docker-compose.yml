@@ -1,5 +1,5 @@
 services:
-  app:
+  daddykyeta-app:
     container_name: daddykyeta-app
     build: /mnt/user/compose/daddykyeta
     command: node build/main.js
@@ -8,10 +8,10 @@ services:
     volumes:
       - /mnt/user/daddykyeta-data/assets:/app/assets
     depends_on:
-      - db
+      - daddykyeta-db
     restart: unless-stopped
 
-  db:
+  daddykyeta-db:
     container_name: daddykyeta-db
     image: postgres:latest
     env_file:
