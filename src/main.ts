@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import { dirname, importx } from "@discordx/importer";
 import type { Interaction, Message } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
+import { BirthdayService } from "./services/birthdayService.js";
 
 export const bot = new Client({
   // To use only guild command
@@ -26,7 +28,7 @@ export const bot = new Client({
   },
 });
 
-bot.once("ready", () => {
+bot.once("ready", async () => {
   // Make sure all guilds are cached
   // await bot.guilds.fetch();
 
@@ -42,6 +44,16 @@ bot.once("ready", () => {
   //  );
 
   console.log("Bot started");
+
+  // Initialize and start the birthday service
+  const birthdayService = new BirthdayService(bot);
+  await birthdayService.start();
+
+  // Handle graceful shutdown
+  process.on('SIGTERM', async () => {
+    await birthdayService.stop();
+    process.exit(0);
+  });
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {

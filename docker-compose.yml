@@ -1,7 +1,25 @@
-version: "3"
 services:
   app:
+    container_name: daddykyeta-app
     build: .
     command: node build/main.js
-    environment:
-      - BOT_TOKEN=${BOT_TOKEN}
+    env_file:
+      - .env
+    volumes:
+      - ./assets:/app/assets
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    container_name: daddykyeta-db
+    image: postgres:latest
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
