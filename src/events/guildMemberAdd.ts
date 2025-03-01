@@ -22,7 +22,6 @@ export class GuildMemberAddEvent {
             // Check if roles manager exists
             if (!member.roles?.cache) {
                 console.error("Member roles manager is undefined");
-                return;
             }
 
             const unknownRoleId = process.env.UNKNOWN_ROLE_ID;
@@ -33,6 +32,8 @@ export class GuildMemberAddEvent {
 
             // Ensure the member is fetched before trying to modify roles
             const fetchedMember = await member.fetch();
+            console.log(fetchedMember)
+            console.log(fetchedMember.roles)
             await fetchedMember.roles.add(unknownRoleId);
         } catch (error) {
             console.error("Error in onMemberJoin:", {
