@@ -1,30 +1,27 @@
 import { Discord, On } from "discordx";
-import { GuildMember } from "discord.js";
+import { GuildMember, Client } from "discord.js";
 
 @Discord()
 export class GuildMemberAddEvent {
     @On({ event: "guildMemberAdd" })
-    async onMemberJoin(member: GuildMember) {
+    async onMemberJoin(member: GuildMember, client: Client) {
         try {
             if (!member) {
                 console.error("Member object is undefined");
                 return;
             }
 
-            if (!member.guild) {
-                console.error("Member guild is undefined");
+            // Get the guild from the client using guildId
+            const guild = client.guilds.cache.get(member.guild?.id || '');
+            if (!guild) {
+                console.error(`Guild not found for member ${member.id}`);
                 return;
             }
 
             // Fetch a fresh instance of the member
-            const fetchedMember = await member.guild.members.fetch(member.id);
+            const fetchedMember = await guild.members.fetch(member.id);
             if (!fetchedMember) {
                 console.error("Could not fetch member");
-                return;
-            }
-
-            if (!fetchedMember.roles) {
-                console.error("Fetched member roles object is undefined");
                 return;
             }
 
@@ -35,15 +32,16 @@ export class GuildMemberAddEvent {
             }
 
             await fetchedMember.roles.add(unknownRoleId);
-            console.log(`Added unknown role to new member ${fetchedMember.id}`);
+            console.log(`Added unknown role to new member ${fetchedMember.id} in guild ${guild.name}`);
         } catch (error) {
             console.error("Error in onMemberJoin:", {
                 error,
                 memberExists: !!member,
-                guildExists: !!member?.guild,
                 memberId: member?.id,
                 guildId: member?.guild?.id,
-                unknownRoleId: process.env.UNKNOWN_ROLE_ID
+                unknownRoleId: process.env.UNKNOWN_ROLE_ID,
+                clientReady: client?.isReady(),
+                guildsAvailable: client?.guilds?.cache?.size
             });
         }
     }
