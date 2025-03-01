@@ -11,8 +11,20 @@ export class GuildMemberAddEvent {
                 return;
             }
 
-            if (!member.roles) {
-                console.error("Member roles object is undefined");
+            if (!member.guild) {
+                console.error("Member guild is undefined");
+                return;
+            }
+
+            // Fetch a fresh instance of the member
+            const fetchedMember = await member.guild.members.fetch(member.id);
+            if (!fetchedMember) {
+                console.error("Could not fetch member");
+                return;
+            }
+
+            if (!fetchedMember.roles) {
+                console.error("Fetched member roles object is undefined");
                 return;
             }
 
@@ -22,16 +34,15 @@ export class GuildMemberAddEvent {
                 return;
             }
 
-            await member.roles.add(unknownRoleId);
-            console.log(`Added unknown role to new member ${member.id}`);
+            await fetchedMember.roles.add(unknownRoleId);
+            console.log(`Added unknown role to new member ${fetchedMember.id}`);
         } catch (error) {
             console.error("Error in onMemberJoin:", {
                 error,
                 memberExists: !!member,
-                rolesExists: !!(member?.roles),
+                guildExists: !!member?.guild,
                 memberId: member?.id,
                 guildId: member?.guild?.id,
-                memberPermissions: member?.permissions?.toArray(),
                 unknownRoleId: process.env.UNKNOWN_ROLE_ID
             });
         }
