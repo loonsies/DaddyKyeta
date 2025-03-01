@@ -6,7 +6,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./assets:/app/assets
+      - /mnt/user/daddykyeta-data/assets:/app/assets
     depends_on:
       - db
     restart: unless-stopped
