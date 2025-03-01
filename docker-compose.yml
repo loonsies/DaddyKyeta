@@ -4,7 +4,7 @@ services:
     build: /mnt/user/compose/daddykyeta
     command: node build/main.js
     env_file:
-      - .env
+      - /mnt/user/compose/daddykyeta/.env
     volumes:
       - /mnt/user/daddykyeta-data/assets:/app/assets
     depends_on:
@@ -14,7 +14,7 @@ services:
   db:
     container_name: daddykyeta-db
     image: postgres:latest
-    env_file: .env
+      - /mnt/user/compose/daddykyeta/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
