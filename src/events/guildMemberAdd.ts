@@ -13,9 +13,9 @@ export class GuildMemberAddEvent {
             }
 
             await member.roles.add(unknownRoleId);
-            console.log(`Added unknown role to new member ${member.user.tag}`);
+            console.log(`Added unknown role to new member ${member.id}`);
         } catch (error) {
-            console.error(`Error adding role to new member ${member.user.tag}:`, error);
+            console.error(`Error adding role to new member ${member.id}:`, error);
         }
     }
 } 
