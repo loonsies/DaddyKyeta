@@ -17,7 +17,7 @@ export class TimezoneCommands {
   async addtimezonebutton(interaction: CommandInteraction) {
     const channel = interaction.channel as TextChannel;
     await channel.send({
-      content: "To set your timezone, click the button below.\nIf you're unsure about your timezone, you can find it here : https://zones.arilyn.cc\n Click this button to set your timezone 🕑 :",
+      content: "To set your timezone, click the button below.\nIf you're unsure about your timezone, you can find it here : https://zones.arilyn.cc\nClick this button to set your timezone 🕑 :",
       components: [
         new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
