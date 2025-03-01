@@ -10,9 +10,20 @@ export class GuildMemberAddEvent {
                 console.error("Member object is undefined");
                 return;
             }
-            console.log(member)
-            console.log(await member.roles)
 
+            // Debug logging to understand the member object structure
+            console.log("Member object:", {
+                id: member.id,
+                guildId: member.guild?.id,
+                roles: member.roles,
+                isPartial: member.partial
+            });
+
+            // Check if roles manager exists
+            if (!member.roles?.cache) {
+                console.error("Member roles manager is undefined");
+                return;
+            }
 
             const unknownRoleId = process.env.UNKNOWN_ROLE_ID;
             if (!unknownRoleId) {
@@ -20,7 +31,9 @@ export class GuildMemberAddEvent {
                 return;
             }
 
-            await member.roles.add(unknownRoleId);
+            // Ensure the member is fetched before trying to modify roles
+            const fetchedMember = await member.fetch();
+            await fetchedMember.roles.add(unknownRoleId);
         } catch (error) {
             console.error("Error in onMemberJoin:", {
                 error,
