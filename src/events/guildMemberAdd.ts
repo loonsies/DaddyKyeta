@@ -10,20 +10,9 @@ export class GuildMemberAddEvent {
                 console.error("Member object is undefined");
                 return;
             }
+            console.log(member)
+            console.log(await member.roles)
 
-            // Get the guild from the client using guildId
-            const guild = client.guilds.cache.get(member.guild?.id || '');
-            if (!guild) {
-                console.error(`Guild not found for member ${member.id}`);
-                return;
-            }
-
-            // Fetch a fresh instance of the member
-            const fetchedMember = await guild.members.fetch(member.id);
-            if (!fetchedMember) {
-                console.error("Could not fetch member");
-                return;
-            }
 
             const unknownRoleId = process.env.UNKNOWN_ROLE_ID;
             if (!unknownRoleId) {
@@ -31,8 +20,7 @@ export class GuildMemberAddEvent {
                 return;
             }
 
-            await fetchedMember.roles.add(unknownRoleId);
-            console.log(`Added unknown role to new member ${fetchedMember.id} in guild ${guild.name}`);
+            await member.roles.add(unknownRoleId);
         } catch (error) {
             console.error("Error in onMemberJoin:", {
                 error,
