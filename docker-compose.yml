@@ -1,7 +1,7 @@
 services:
   app:
     container_name: daddykyeta-app
-    build: .
+    build: /mnt/user/compose/daddykyeta
     command: node build/main.js
     env_file:
       - .env
