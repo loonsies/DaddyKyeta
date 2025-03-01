@@ -1,5 +1,5 @@
-import { Discord, On } from "discordx";
-import { GuildMember, Client } from "discord.js";
+import { Discord, On, Client } from "discordx";
+import { GuildMember } from "discord.js";
 
 @Discord()
 export class GuildMemberAddEvent {
