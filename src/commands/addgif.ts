@@ -3,30 +3,34 @@ import { CommandInteraction, ApplicationCommandOptionType, AttachmentBuilder } f
 import fs from "fs";
 import path from "path";
 import https from "https";
+import http from "http";
 
 @Discord()
 export class AddGifCommand {
   private readonly validFolders = ["bonk", "boop"] as const;
+  private readonly validExtensions = [".gif", ".mp4"] as const;
+  private readonly maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
 
   @Slash({
-    description: "Add a GIF to bonk or boop folder",
+    description: "Add a GIF/MP4 to bonk or boop folder (Admin only)",
+    defaultMemberPermissions: ["Administrator"]
   })
   async addgif(
     @SlashOption({
       name: "folder",
-      description: "The folder to add the GIF to (bonk/boop)",
+      description: "The folder to add the file to (bonk/boop)",
       required: true,
       type: ApplicationCommandOptionType.String
     }) folder: "bonk" | "boop",
     @SlashOption({
       name: "url",
-      description: "The URL of the GIF to add",
+      description: "The URL of the GIF/MP4 to add",
       required: true,
       type: ApplicationCommandOptionType.String
     }) url: string,
     @SlashOption({
       name: "name",
-      description: "The name to save the GIF as (without extension, uses original filename if not specified)",
+      description: "The name to save the file as (without extension, uses original filename if not specified)",
       required: false,
       type: ApplicationCommandOptionType.String
     }) name: string | undefined,
@@ -42,10 +46,12 @@ export class AddGifCommand {
         return;
       }
 
-      // Validate URL
-      if (!url.toLowerCase().endsWith('.gif')) {
+      // Validate URL extension
+      const urlLower = url.toLowerCase();
+      const extension = this.validExtensions.find(ext => urlLower.endsWith(ext));
+      if (!extension) {
         await interaction.reply({
-          content: "The URL must point to a GIF file.",
+          content: `The URL must point to one of these file types: ${this.validExtensions.join(", ")}`,
           ephemeral: true
         });
         return;
@@ -56,11 +62,11 @@ export class AddGifCommand {
       if (name) {
         sanitizedName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       } else {
-        // Extract filename from URL and remove .gif extension
+        // Extract filename from URL and remove extension
         const urlFilename = new URL(url).pathname.split('/').pop() || 'unnamed';
-        sanitizedName = urlFilename.replace(/\.gif$/i, '').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        sanitizedName = urlFilename.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9]/gi, '_').toLowerCase();
       }
-      const filename = `${sanitizedName}.gif`;
+      const filename = `${sanitizedName}${extension}`;
       
       // Get the assets folder path
       const assetsFolder = path.join(
@@ -72,7 +78,7 @@ export class AddGifCommand {
       // Check if file already exists
       if (fs.existsSync(path.join(assetsFolder, filename))) {
         await interaction.reply({
-          content: `A GIF with the name "${filename}" already exists in the ${folder} folder.`,
+          content: `A file with the name "${filename}" already exists in the ${folder} folder.`,
           ephemeral: true
         });
         return;
@@ -81,16 +87,36 @@ export class AddGifCommand {
       // Defer the reply as downloading might take some time
       await interaction.deferReply({ ephemeral: true });
 
-      // Download and save the GIF
+      // Download and save the file
       const filePath = path.join(assetsFolder, filename);
       await new Promise((resolve, reject) => {
-        https.get(url, (response) => {
+        const protocol = url.startsWith('https') ? https : http;
+        let downloadedBytes = 0;
+
+        protocol.get(url, (response) => {
           if (response.statusCode !== 200) {
-            reject(new Error(`Failed to download GIF: ${response.statusCode}`));
+            reject(new Error(`Failed to download file: ${response.statusCode}`));
+            return;
+          }
+
+          // Check Content-Length if available
+          const contentLength = response.headers['content-length'];
+          if (contentLength && parseInt(contentLength) > this.maxSizeBytes) {
+            reject(new Error(`File size exceeds 10MB limit`));
             return;
           }
 
           const fileStream = fs.createWriteStream(filePath);
+
+          response.on('data', (chunk) => {
+            downloadedBytes += chunk.length;
+            if (downloadedBytes > this.maxSizeBytes) {
+              fileStream.destroy();
+              fs.unlink(filePath, () => {});
+              reject(new Error(`File size exceeds 10MB limit`));
+            }
+          });
+
           response.pipe(fileStream);
 
           fileStream.on('finish', () => {
@@ -111,13 +137,14 @@ export class AddGifCommand {
       });
 
     } catch (error) {
-      console.error('Error adding GIF:', error);
+      console.error('Error adding file:', error);
       const message = interaction.deferred ? 
         interaction.editReply.bind(interaction) : 
         interaction.reply.bind(interaction);
       
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       await message({
-        content: "Sorry, there was an error adding the GIF. Please try again later.",
+        content: `Sorry, there was an error adding the file: ${errorMessage}. Please try again.`,
         ephemeral: true
       });
     }
