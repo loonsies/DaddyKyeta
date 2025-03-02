@@ -361,4 +361,59 @@ export class BirthdayCommands {
       });
     }
   }
+
+  @Slash({
+    description: "Check a user's birthday (Admin only)",
+    defaultMemberPermissions: ["Administrator"]
+  })
+  async checkbirthday(
+    @SlashOption({
+      name: "user",
+      description: "The user to check birthday for",
+      required: true,
+      type: ApplicationCommandOptionType.User
+    }) user: User,
+    interaction: CommandInteraction
+  ) {
+    try {
+      // Get user's birthday from database
+      const userProfile = await db
+        .select()
+        .from(users)
+        .where(({ userId }) => eq(userId, user.id))
+        .limit(1);
+
+      if (!userProfile.length) {
+        await interaction.reply({
+          content: `<@${user.id}> hasn't set their birthday yet.`,
+          flags: MessageFlags.Ephemeral
+        });
+        return;
+      }
+
+      const profile = userProfile[0];
+      if (!profile.birthday || !profile.timezone) {
+        throw new Error('Missing birthday data');
+      }
+      
+      const birthday = DateTime.fromJSDate(profile.birthday)
+        .setZone(profile.timezone);
+
+      if (!birthday.isValid) {
+        throw new Error('Invalid stored datetime');
+      }
+
+      const timestamp = Math.floor(birthday.toSeconds());
+      await interaction.reply({
+        content: `Birthday for <@${user.id}>:\nDate: <t:${timestamp}:F>\nTimezone: ${profile.timezone}`,
+        flags: MessageFlags.Ephemeral
+      });
+    } catch (error) {
+      console.error('Error fetching birthday:', error);
+      await interaction.reply({
+        content: "Sorry, there was an error fetching the birthday information.",
+        flags: MessageFlags.Ephemeral
+      });
+    }
+  }
 }
