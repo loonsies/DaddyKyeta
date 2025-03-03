@@ -30,7 +30,7 @@ export class AddGifCommand {
   async addgif(
     @SlashOption({
       name: "folder",
-      description: "The folder to add the file to (bonk/boop)",
+      description: "The folder to add the file to (bonk/boop/bite)",
       required: true,
       type: ApplicationCommandOptionType.String
     }) folder: "bonk" | "boop" | "bite",
