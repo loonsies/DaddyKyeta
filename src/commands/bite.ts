@@ -125,7 +125,7 @@ export class BiteCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached biter level ${newLevel}!  🦷✨😈`;
+        replyMessage += `\n${sender} reached biter level ${newLevel}!  😺🦷🤤`;
       }
 
       // Send the bite message with the gif and count
