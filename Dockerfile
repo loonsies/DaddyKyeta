@@ -12,13 +12,16 @@ RUN npm install
 
 # Move source files
 COPY src ./src
-COPY tsconfig.json   .
+COPY tsconfig.json .
 
 # Build project
 RUN npm run build
 
 ## production runner
 FROM node:lts-alpine as prod-runner
+
+# Install FFmpeg
+RUN apk add --no-cache ffmpeg
 
 # Set work directory
 WORKDIR /app

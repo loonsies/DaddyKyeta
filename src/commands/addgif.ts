@@ -4,12 +4,25 @@ import fs from "fs";
 import path from "path";
 import https from "https";
 import http from "http";
+import ffmpeg from 'fluent-ffmpeg';
+import { unlink } from 'fs/promises';
 
 @Discord()
 export class AddGifCommand {
   private readonly validFolders = ["bonk", "boop"] as const;
-  private readonly validExtensions = [".gif", ".mp4"] as const;
+  private readonly validExtensions = [".gif", ".mp4", ".webp"] as const;
   private readonly maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
+  
+  private async convertToWebp(inputPath: string, outputPath: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      ffmpeg(inputPath)
+        .toFormat('webp')
+        .addOutputOptions(['-vcodec', 'libwebp', '-lossless', '0', '-quality', '100', '-loop', '0'])
+        .save(outputPath)
+        .on('end', () => resolve())
+        .on('error', (err: Error) => reject(err));
+    });
+  }
 
   @Slash({
     description: "Add a GIF/MP4 to bonk or boop folder (Admin only)",
@@ -24,7 +37,7 @@ export class AddGifCommand {
     }) folder: "bonk" | "boop",
     @SlashOption({
       name: "url",
-      description: "The URL of the GIF/MP4 to add",
+      description: "The URL of the GIF/MP4/WEBM to add",
       required: true,
       type: ApplicationCommandOptionType.String
     }) url: string,
@@ -89,6 +102,10 @@ export class AddGifCommand {
 
       // Download and save the file
       const filePath = path.join(assetsFolder, filename);
+      const finalFilePath = extension === '.mp4' 
+        ? path.join(assetsFolder, `${sanitizedName}.webp`)
+        : filePath;
+
       await new Promise((resolve, reject) => {
         const protocol = url.startsWith('https') ? https : http;
         let downloadedBytes = 0;
@@ -119,8 +136,18 @@ export class AddGifCommand {
 
           response.pipe(fileStream);
 
-          fileStream.on('finish', () => {
+          fileStream.on('finish', async () => {
             fileStream.close();
+            if (extension === '.mp4') {
+              try {
+                await this.convertToWebp(filePath, finalFilePath);
+                await unlink(filePath); // Delete the original MP4 file
+              } catch (err) {
+                await unlink(filePath).catch(() => {}); // Cleanup on error
+                reject(err);
+                return;
+              }
+            }
             resolve(true);
           });
 
@@ -131,9 +158,10 @@ export class AddGifCommand {
         }).on('error', reject);
       });
 
-      // Send success message
+      // Send success message with the final filename
+      const finalFilename = path.basename(finalFilePath);
       await interaction.editReply({
-        content: `Successfully added "${filename}" to the ${folder} folder! ✨`,
+        content: `Successfully added "${finalFilename}" to the ${folder} folder! ✨`,
       });
 
     } catch (error) {
