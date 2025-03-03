@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK } from "../utils/levelUtils.js";
-import { User, CommandInteraction, ApplicationCommandOptionType } from "discord.js";
+import { User, CommandInteraction, ApplicationCommandOptionType, MessageFlags } from "discord.js";
 
 export const command = new SlashCommandBuilder()
   .setName("bonk")
@@ -37,7 +37,7 @@ export class BonkCommands {
     if (target.id === sender.id) {
       return interaction.reply({
         content: "You can't bonk yourself!",
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 

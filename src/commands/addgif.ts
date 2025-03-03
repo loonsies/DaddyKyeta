@@ -1,5 +1,5 @@
 import { Discord, Slash, SlashOption } from "discordx";
-import { CommandInteraction, ApplicationCommandOptionType, AttachmentBuilder } from "discord.js";
+import { CommandInteraction, ApplicationCommandOptionType, MessageFlags } from "discord.js";
 import fs from "fs";
 import path from "path";
 import https from "https";
@@ -54,7 +54,7 @@ export class AddGifCommand {
       if (!this.validFolders.includes(folder)) {
         await interaction.reply({
           content: `Invalid folder. Must be one of: ${this.validFolders.join(", ")}`,
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
         return;
       }
@@ -65,7 +65,7 @@ export class AddGifCommand {
       if (!extension) {
         await interaction.reply({
           content: `The URL must point to one of these file types: ${this.validExtensions.join(", ")}`,
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
         return;
       }
@@ -92,7 +92,7 @@ export class AddGifCommand {
       if (fs.existsSync(path.join(assetsFolder, filename))) {
         await interaction.reply({
           content: `A file with the name "${filename}" already exists in the ${folder} folder.`,
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
         return;
       }
