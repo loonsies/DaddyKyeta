@@ -98,7 +98,7 @@ export class AddGifCommand {
       }
 
       // Defer the reply as downloading might take some time
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
       // Download and save the file
       const filePath = path.join(assetsFolder, filename);
