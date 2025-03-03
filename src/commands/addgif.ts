@@ -9,7 +9,7 @@ import { unlink } from 'fs/promises';
 
 @Discord()
 export class AddGifCommand {
-  private readonly validFolders = ["bonk", "boop"] as const;
+  private readonly validFolders = ["bonk", "boop", "bite"] as const;
   private readonly validExtensions = [".gif", ".mp4", ".webp"] as const;
   private readonly maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
   
@@ -25,8 +25,7 @@ export class AddGifCommand {
   }
 
   @Slash({
-    description: "Add a GIF/MP4 to bonk or boop folder (Admin only)",
-    defaultMemberPermissions: ["Administrator"]
+    description: "Add a GIF/MP4 to bonk or boop folder"
   })
   async addgif(
     @SlashOption({
@@ -34,7 +33,7 @@ export class AddGifCommand {
       description: "The folder to add the file to (bonk/boop)",
       required: true,
       type: ApplicationCommandOptionType.String
-    }) folder: "bonk" | "boop",
+    }) folder: "bonk" | "boop" | "bite",
     @SlashOption({
       name: "url",
       description: "The URL of the GIF/MP4/WEBM to add",
