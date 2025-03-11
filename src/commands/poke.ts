@@ -125,7 +125,7 @@ export class PokeCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached poker level ${newLevel}!  *(˙༥˙(*👈`;
+        replyMessage += `\n${sender} reached poker level ${newLevel}!  **(˙༥˙(**👈`;
       }
 
       // Send the poke message with the gif and count

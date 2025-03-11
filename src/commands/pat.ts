@@ -125,7 +125,7 @@ export class PatCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached patter level ${newLevel}! *( ´･･)ﾉ(˶ˆᗜˆ˵)*`;
+        replyMessage += `\n${sender} reached patter level ${newLevel}! **( ´･･)ﾉ(˶ˆᗜˆ˵)**`;
       }
 
       // Send the pat message with the gif and count

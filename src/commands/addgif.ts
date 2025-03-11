@@ -12,7 +12,7 @@ export class AddGifCommand {
   private readonly validFolders = ["bonk", "boop", "bite", "pat", "poke"] as const;
   private readonly validExtensions = [".gif", ".mp4", ".webp"] as const;
   private readonly maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
-  
+
   private async convertToWebp(inputPath: string, outputPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       ffmpeg(inputPath)
@@ -25,15 +25,15 @@ export class AddGifCommand {
   }
 
   @Slash({
-    description: "Add a GIF/MP4 to bonk or boop folder"
+    description: "Add a GIF/MP4 to the specified folder"
   })
   async addgif(
     @SlashOption({
       name: "folder",
-      description: "The folder to add the file to (bonk/boop/bite)",
+      description: "The folder to add the file to the specified folder",
       required: true,
       type: ApplicationCommandOptionType.String
-    }) folder: "bonk" | "boop" | "bite",
+    }) folder: typeof this.validFolders[number],
     @SlashOption({
       name: "url",
       description: "The URL of the GIF/MP4/WEBM to add",
