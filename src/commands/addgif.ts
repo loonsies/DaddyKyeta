@@ -9,7 +9,7 @@ import { unlink } from 'fs/promises';
 
 @Discord()
 export class AddGifCommand {
-  private readonly validFolders = ["bonk", "boop", "bite"] as const;
+  private readonly validFolders = ["bonk", "boop", "bite", "pat", "poke"] as const;
   private readonly validExtensions = [".gif", ".mp4", ".webp"] as const;
   private readonly maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
   
