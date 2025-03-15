@@ -121,7 +121,7 @@ export class SmoochCommands {
         );
 
       // Prepare the reply message
-      let replyMessage = `${sender} smoochd ${target}! (${smoochCount.count} times total)`;
+      let replyMessage = `${sender} smooched ${target}! (${smoochCount.count} times total)`;
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
