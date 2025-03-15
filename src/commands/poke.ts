@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK as XP_PER_POKE } from "../utils/levelUtils.js";
+import { getRandomGif } from "../utils/gifUtils.js";
 import { CommandInteraction, ApplicationCommandOptionType, User, MessageFlags } from "discord.js";
 
 export const command = new SlashCommandBuilder()
@@ -47,7 +48,7 @@ export class PokeCommands {
       "../../assets/poke"
     );
     const pokeGifs = fs.readdirSync(pokeFolder);
-    const randomGif = pokeGifs[Math.floor(Math.random() * pokeGifs.length)];
+    const randomGif = getRandomGif('poke', pokeGifs);
     const gifPath = path.join(pokeFolder, randomGif);
 
     // Update database for both users

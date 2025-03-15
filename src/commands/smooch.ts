@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK as XP_PER_SMOOCH } from "../utils/levelUtils.js";
+import { getRandomGif } from "../utils/gifUtils.js";
 import { CommandInteraction, ApplicationCommandOptionType, User, MessageFlags } from "discord.js";
 
 export const command = new SlashCommandBuilder()
@@ -47,7 +48,7 @@ export class SmoochCommands {
       "../../assets/smooch"
     );
     const smoochGifs = fs.readdirSync(smoochFolder);
-    const randomGif = smoochGifs[Math.floor(Math.random() * smoochGifs.length)];
+    const randomGif = getRandomGif('smooch', smoochGifs);
     const gifPath = path.join(smoochFolder, randomGif);
 
     // Update database for both users

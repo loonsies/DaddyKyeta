@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK as XP_PER_BITE } from "../utils/levelUtils.js";
+import { getRandomGif } from "../utils/gifUtils.js";
 import { CommandInteraction, ApplicationCommandOptionType, User, MessageFlags } from "discord.js";
 
 export const command = new SlashCommandBuilder()
@@ -47,7 +48,7 @@ export class BiteCommands {
       "../../assets/bite"
     );
     const biteGifs = fs.readdirSync(biteFolder);
-    const randomGif = biteGifs[Math.floor(Math.random() * biteGifs.length)];
+    const randomGif = getRandomGif('bite', biteGifs);
     const gifPath = path.join(biteFolder, randomGif);
 
     // Update database for both users

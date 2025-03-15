@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK } from "../utils/levelUtils.js";
+import { getRandomGif } from "../utils/gifUtils.js";
 import { User, CommandInteraction, ApplicationCommandOptionType, MessageFlags } from "discord.js";
 
 export const command = new SlashCommandBuilder()
@@ -47,7 +48,7 @@ export class BonkCommands {
       "../../assets/bonk"
     );
     const bonkGifs = fs.readdirSync(bonkFolder);
-    const randomGif = bonkGifs[Math.floor(Math.random() * bonkGifs.length)];
+    const randomGif = getRandomGif('bonk', bonkGifs);
     const gifPath = path.join(bonkFolder, randomGif);
 
     // Update database for both users
