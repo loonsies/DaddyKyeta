@@ -125,7 +125,7 @@ export class SmoochCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached smoochr level ${newLevel}!  **(=˘ ³( ,,>ᴗ<,,) ~♡**`;
+        replyMessage += `\n${sender} reached smoocher level ${newLevel}!  **(=˘ ³( ,,>ᴗ<,,) ~♡**`;
       }
 
       // Send the smooch message with the gif and count
