@@ -36,11 +36,14 @@ export class BonkCommands {
 
     // Don't allow self-bonking
     if (target.id === sender.id) {
-      return interaction.reply({
-        content: "You can't bonk yourself!",
-        flags: MessageFlags.Ephemeral
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      return interaction.editReply({
+        content: "You can't bonk yourself!"
       });
     }
+
+    // Defer the reply immediately
+    await interaction.deferReply();
 
     // Get random bonk gif
     const bonkFolder = path.join(
@@ -130,7 +133,7 @@ export class BonkCommands {
       }
 
       // Send the bonk message with the gif and count
-      await interaction.reply({
+      await interaction.editReply({
         content: replyMessage,
         files: [gifPath]
       });

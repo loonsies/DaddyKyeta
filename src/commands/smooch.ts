@@ -36,12 +36,15 @@ export class SmoochCommands {
 
     // Don't allow self-poking
     if (target.id === sender.id) {
-      return interaction.reply({
-        content: "You can't smooch yourself!",
-        flags: MessageFlags.Ephemeral
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      return interaction.editReply({
+        content: "You can't smooch yourself!"
       });
     }
 
+    // Defer the reply immediately
+    await interaction.deferReply();
+    
     // Get random smooch gif
     const smoochFolder = path.join(
       path.dirname(new URL(import.meta.url).pathname),
@@ -130,7 +133,7 @@ export class SmoochCommands {
       }
 
       // Send the smooch message with the gif and count
-      await interaction.reply({
+      await interaction.editReply({
         content: replyMessage,
         files: [gifPath]
       });

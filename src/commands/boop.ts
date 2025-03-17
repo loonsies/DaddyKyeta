@@ -36,12 +36,15 @@ export class BoopCommands {
 
     // Don't allow self-booping
     if (target.id === sender.id) {
-      return interaction.reply({
-        content: "You can't boop yourself!",
-        flags: MessageFlags.Ephemeral
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      return interaction.editReply({
+        content: "You can't boop yourself!"
       });
     }
 
+    // Defer the reply immediately
+    await interaction.deferReply();
+    
     // Get random boop gif
     const boopFolder = path.join(
       path.dirname(new URL(import.meta.url).pathname),
@@ -130,7 +133,7 @@ export class BoopCommands {
       }
 
       // Send the boop message with the gif and count
-      await interaction.reply({
+      await interaction.editReply({
         content: replyMessage,
         files: [gifPath]
       });

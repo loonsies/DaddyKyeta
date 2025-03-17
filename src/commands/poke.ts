@@ -36,11 +36,14 @@ export class PokeCommands {
 
     // Don't allow self-poking
     if (target.id === sender.id) {
-      return interaction.reply({
-        content: "You can't poke yourself!",
-        flags: MessageFlags.Ephemeral
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      return interaction.editReply({
+        content: "You can't poke yourself!"
       });
     }
+
+    // Defer the reply immediately
+    await interaction.deferReply();
 
     // Get random poke gif
     const pokeFolder = path.join(
@@ -130,7 +133,7 @@ export class PokeCommands {
       }
 
       // Send the poke message with the gif and count
-      await interaction.reply({
+      await interaction.editReply({
         content: replyMessage,
         files: [gifPath]
       });

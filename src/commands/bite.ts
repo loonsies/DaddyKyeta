@@ -36,12 +36,15 @@ export class BiteCommands {
 
     // Don't allow self-biting
     if (target.id === sender.id) {
-      return interaction.reply({
-        content: "You can't bite yourself!",
-        flags: MessageFlags.Ephemeral
+      await interaction.deferReply({ ephemeral: true });
+      return interaction.editReply({
+        content: "You can't bite yourself!"
       });
     }
 
+    // Defer the reply immediately
+    await interaction.deferReply();
+    
     // Get random bite gif
     const biteFolder = path.join(
       path.dirname(new URL(import.meta.url).pathname),
@@ -130,7 +133,7 @@ export class BiteCommands {
       }
 
       // Send the bite message with the gif and count
-      await interaction.reply({
+      await interaction.editReply({
         content: replyMessage,
         files: [gifPath]
       });

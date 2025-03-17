@@ -49,11 +49,12 @@ export class AddGifCommand {
     interaction: CommandInteraction
   ) {
     try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
       // Validate folder
       if (!this.validFolders.includes(folder)) {
-        await interaction.reply({
+        await interaction.editReply({
           content: `Invalid folder. Must be one of: ${this.validFolders.join(", ")}`,
-          flags: MessageFlags.Ephemeral
         });
         return;
       }
@@ -62,9 +63,8 @@ export class AddGifCommand {
       const urlLower = url.toLowerCase();
       const extension = this.validExtensions.find(ext => urlLower.endsWith(ext));
       if (!extension) {
-        await interaction.reply({
+        await interaction.editReply({
           content: `The URL must point to one of these file types: ${this.validExtensions.join(", ")}`,
-          flags: MessageFlags.Ephemeral
         });
         return;
       }
@@ -89,15 +89,11 @@ export class AddGifCommand {
 
       // Check if file already exists
       if (fs.existsSync(path.join(assetsFolder, filename))) {
-        await interaction.reply({
+        await interaction.editReply({
           content: `A file with the name "${filename}" already exists in the ${folder} folder.`,
-          flags: MessageFlags.Ephemeral
         });
         return;
       }
-
-      // Defer the reply as downloading might take some time
-      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
       // Download and save the file
       const filePath = path.join(assetsFolder, filename);
@@ -165,14 +161,8 @@ export class AddGifCommand {
 
     } catch (error) {
       console.error('Error adding file:', error);
-      const message = interaction.deferred ? 
-        interaction.editReply.bind(interaction) : 
-        interaction.reply.bind(interaction);
-      
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-      await message({
-        content: `Sorry, there was an error adding the file: ${errorMessage}. Please try again.`,
-        ephemeral: true
+      await interaction.editReply({
+        content: `Sorry, there was an error adding the file: ${error instanceof Error ? error.message : "An unknown error occurred"}. Please try again.`,
       });
     }
   }

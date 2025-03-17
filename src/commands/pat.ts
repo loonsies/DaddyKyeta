@@ -36,11 +36,14 @@ export class PatCommands {
 
     // Don't allow self-patting
     if (target.id === sender.id) {
-      return interaction.reply({
-        content: "You can't pat yourself!",
-        flags: MessageFlags.Ephemeral
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      return interaction.editReply({
+        content: "You can't pat yourself!"
       });
     }
+
+    // Defer the reply immediately
+    await interaction.deferReply();
 
     // Get random pat gif
     const patFolder = path.join(
@@ -130,7 +133,7 @@ export class PatCommands {
       }
 
       // Send the pat message with the gif and count
-      await interaction.reply({
+      await interaction.editReply({
         content: replyMessage,
         files: [gifPath]
       });

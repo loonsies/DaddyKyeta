@@ -164,6 +164,8 @@ export class TimezoneCommands {
     interaction: CommandInteraction
   ) {
     try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      
       const userTimezone = await db
         .select({ timezone: users.timezone })
         .from(users)
@@ -171,25 +173,22 @@ export class TimezoneCommands {
         .then(rows => rows[0]?.timezone);
 
       if (!userTimezone) {
-        await interaction.reply({
+        await interaction.editReply({
           content: `<@${targetUser.id}> hasn't set their timezone yet. They can set it using the timezone setup button!`,
-          flags: MessageFlags.Ephemeral,
         });
         return;
       }
 
       const userTime = DateTime.now().setZone(userTimezone);
       
-      await interaction.reply({
+      await interaction.editReply({
         content: `<@${targetUser.id}>'s local time: **${userTime.toLocaleString(DateTime.DATETIME_FULL)} (${userTime.toFormat('HH:mm')})** *(${userTimezone})*`,
-        flags: MessageFlags.Ephemeral,
       });
 
     } catch (error) {
       console.error('Error fetching timezone:', error);
-      await interaction.reply({
+      await interaction.editReply({
         content: "Sorry, there was an error fetching the timezone. Please try again later.",
-        flags: MessageFlags.Ephemeral,
       });
     }
   }
@@ -200,6 +199,8 @@ export class TimezoneCommands {
   })
   async userTimeContext(interaction: UserContextMenuCommandInteraction) {
     try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      
       const userTimezone = await db
         .select({ timezone: users.timezone })
         .from(users)
@@ -207,25 +208,22 @@ export class TimezoneCommands {
         .then(rows => rows[0]?.timezone);
 
       if (!userTimezone) {
-        await interaction.reply({
+        await interaction.editReply({
           content: `<@${interaction.targetId}> hasn't set their timezone yet. They can set it using the timezone setup button!`,
-          flags: MessageFlags.Ephemeral,
         });
         return;
       }
 
       const userTime = DateTime.now().setZone(userTimezone);
       
-      await interaction.reply({
+      await interaction.editReply({
         content: `<@${interaction.targetId}>'s local time: **${userTime.toLocaleString(DateTime.DATETIME_FULL)} (${userTime.toFormat('HH:mm')})** *(${userTimezone})*`,
-        flags: MessageFlags.Ephemeral,
       });
 
     } catch (error) {
       console.error('Error fetching timezone:', error);
-      await interaction.reply({
+      await interaction.editReply({
         content: "Sorry, there was an error fetching the timezone. Please try again later.",
-        flags: MessageFlags.Ephemeral,
       });
     }
   }
