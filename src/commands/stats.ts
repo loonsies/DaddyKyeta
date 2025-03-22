@@ -70,7 +70,7 @@ export class StatsCommands {
 
     // Create embed for the stats
     const embed = new EmbedBuilder()
-      .setTitle(`📊 Statistics for ${interaction.user}`)
+      .setTitle(`📊 Statistics for ${interaction.user.toString()}`)
       .setColor("#00FF00")
       .setTimestamp();
 
@@ -83,7 +83,7 @@ export class StatsCommands {
 
       embed.addFields({
         name: `${type.charAt(0).toUpperCase() + type.slice(1)}s ${INTERACTION_EMOJIS[type]}`,
-        value: `Sent: ${stats[sentKey] || 0}\nReceived: ${stats[receivedKey] || 0}\nMost used on: ${favorite?.target ? `${favorite.target} (${favorite.count} times)` : 'Nobody yet'}`,
+        value: `Sent: ${stats[sentKey] || 0}\nReceived: ${stats[receivedKey] || 0}\nMost used on: ${favorite?.target ? `${favorite.target.toString()} (${favorite.count} times)` : 'Nobody yet'}`,
         inline: true
       });
     }

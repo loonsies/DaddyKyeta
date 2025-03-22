@@ -66,7 +66,7 @@ export class LeaderboardCommands {
       for (let i = 0; i < results.length; i++) {
         const user = await interaction.client.users.fetch(results[i].userId);
         embed.addFields({
-          name: `${medals[i]} ${user}`,
+          name: `${medals[i]} ${user.toString()}`,
           value: `${results[i].count} ${type}s sent`,
           inline: false
         });
