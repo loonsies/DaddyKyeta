@@ -9,6 +9,7 @@ import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK as XP_PER_PAT } from "../utils/levelUtils.js";
 import { getRandomGif } from "../utils/gifUtils.js";
 import { CommandInteraction, ApplicationCommandOptionType, User, MessageFlags } from "discord.js";
+import { INTERACTION_TITLES, INTERACTION_EMOJIS } from "../data/interactions.js";
 
 export const command = new SlashCommandBuilder()
   .setName("pat")
@@ -129,7 +130,7 @@ export class PatCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached patter level ${newLevel}! **( ´･･)ﾉ(˶ˆᗜˆ˵)**`;
+        replyMessage += `\n${sender} reached ${INTERACTION_TITLES.pat} level ${newLevel}! ${INTERACTION_EMOJIS.pat}`;
       }
 
       // Send the pat message with the gif and count

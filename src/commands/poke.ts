@@ -9,6 +9,7 @@ import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK as XP_PER_POKE } from "../utils/levelUtils.js";
 import { getRandomGif } from "../utils/gifUtils.js";
 import { CommandInteraction, ApplicationCommandOptionType, User, MessageFlags } from "discord.js";
+import { INTERACTION_TITLES, INTERACTION_EMOJIS } from "../data/interactions.js";
 
 export const command = new SlashCommandBuilder()
   .setName("poke")
@@ -129,7 +130,7 @@ export class PokeCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached poker level ${newLevel}!  **(˙༥˙(**👈`;
+        replyMessage += `\n${sender} reached ${INTERACTION_TITLES.poke} level ${newLevel}! ${INTERACTION_EMOJIS.poke}`;
       }
 
       // Send the poke message with the gif and count

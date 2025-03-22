@@ -6,10 +6,11 @@ import https from "https";
 import http from "http";
 import ffmpeg from 'fluent-ffmpeg';
 import { unlink } from 'fs/promises';
+import { INTERACTION_TYPES } from "../data/interactions.js";
 
 @Discord()
 export class AddGifCommand {
-  private readonly validFolders = ["bonk", "boop", "bite", "pat", "poke", "smooch"] as const;
+  private readonly validFolders = INTERACTION_TYPES;
   private readonly validExtensions = [".gif", ".mp4", ".webp"] as const;
   private readonly maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
 

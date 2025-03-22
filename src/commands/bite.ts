@@ -9,6 +9,7 @@ import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK as XP_PER_BITE } from "../utils/levelUtils.js";
 import { getRandomGif } from "../utils/gifUtils.js";
 import { CommandInteraction, ApplicationCommandOptionType, User, MessageFlags } from "discord.js";
+import { INTERACTION_TITLES, INTERACTION_EMOJIS } from "../data/interactions.js";
 
 export const command = new SlashCommandBuilder()
   .setName("bite")
@@ -129,7 +130,7 @@ export class BiteCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached biter level ${newLevel}!  😺🦷🤤`;
+        replyMessage += `\n${sender} reached ${INTERACTION_TITLES.bite} level ${newLevel}! ${INTERACTION_EMOJIS.bite}`;
       }
 
       // Send the bite message with the gif and count

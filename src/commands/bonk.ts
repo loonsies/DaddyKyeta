@@ -9,6 +9,7 @@ import { and } from "drizzle-orm";
 import { calculateLevel, calculateXpForLevel, XP_PER_BONK } from "../utils/levelUtils.js";
 import { getRandomGif } from "../utils/gifUtils.js";
 import { User, CommandInteraction, ApplicationCommandOptionType, MessageFlags } from "discord.js";
+import { INTERACTION_TITLES, INTERACTION_EMOJIS } from "../data/interactions.js";
 
 export const command = new SlashCommandBuilder()
   .setName("bonk")
@@ -129,7 +130,7 @@ export class BonkCommands {
       
       // Add level up message if applicable
       if (newLevel > oldLevel) {
-        replyMessage += `\n${sender} reached bonker level ${newLevel}!  🔨💥🤕`;
+        replyMessage += `\n${sender} reached ${INTERACTION_TITLES.bonk} level ${newLevel}! ${INTERACTION_EMOJIS.bonk}`;
       }
 
       // Send the bonk message with the gif and count
