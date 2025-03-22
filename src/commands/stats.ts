@@ -4,7 +4,7 @@ import { db } from "../database/database.js";
 import { users, bonkInteractions, boopInteractions, biteInteractions, patInteractions, pokeInteractions, smoochInteractions } from "../database/schema.js";
 import { sql } from "drizzle-orm";
 import { CommandInteraction, EmbedBuilder } from "discord.js";
-import { INTERACTION_TYPES, InteractionType } from "../data/interactions.js";
+import { INTERACTION_TYPES, InteractionType, INTERACTION_EMOJIS } from "../data/interactions.js";
 
 const interactionTables = {
   bonk: bonkInteractions,
@@ -70,7 +70,7 @@ export class StatsCommands {
 
     // Create embed for the stats
     const embed = new EmbedBuilder()
-      .setTitle(`📊 Statistics for ${interaction.user.username}`)
+      .setTitle(`📊 Statistics for ${interaction.user}`)
       .setColor("#00FF00")
       .setTimestamp();
 
@@ -82,8 +82,8 @@ export class StatsCommands {
       const favorite = favoriteTargets.find(t => t.type === type);
 
       embed.addFields({
-        name: `${type.charAt(0).toUpperCase() + type.slice(1)}s`,
-        value: `Sent: ${stats[sentKey] || 0}\nReceived: ${stats[receivedKey] || 0}\nMost used on: ${favorite?.target ? `${favorite.target.username} (${favorite.count} times)` : 'Nobody yet'}`,
+        name: `${type.charAt(0).toUpperCase() + type.slice(1)}s ${INTERACTION_EMOJIS[type]}`,
+        value: `Sent: ${stats[sentKey] || 0}\nReceived: ${stats[receivedKey] || 0}\nMost used on: ${favorite?.target ? `${favorite.target} (${favorite.count} times)` : 'Nobody yet'}`,
         inline: true
       });
     }

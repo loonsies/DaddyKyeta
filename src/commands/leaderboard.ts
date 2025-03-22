@@ -48,6 +48,7 @@ export class LeaderboardCommands {
       count: sentColumns[type]
     })
     .from(users)
+    .where(sql`${sentColumns[type]} > 0`)
     .orderBy(sql`${sentColumns[type]} DESC`)
     .limit(3);
 
@@ -55,18 +56,21 @@ export class LeaderboardCommands {
     const embed = new EmbedBuilder()
       .setTitle(`🏆 Top ${INTERACTION_TITLES[type]}s`)
       .setColor("#FFD700")
-      .setDescription(`The biggest ${type}s 😮`)
       .setTimestamp();
 
-    // Add fields for each user
-    const medals = ["🥇", "🥈", "🥉"];
-    for (let i = 0; i < results.length; i++) {
-      const user = await interaction.client.users.fetch(results[i].userId);
-      embed.addFields({
-        name: `${medals[i]} ${user.username}`,
-        value: `${results[i].count} ${type}s sent`,
-        inline: false
-      });
+    if (results.length === 0) {
+      embed.setDescription(`No ${type}s have been sent yet!`);
+    } else {
+      // Add fields for each user
+      const medals = ["🥇", "🥈", "🥉"];
+      for (let i = 0; i < results.length; i++) {
+        const user = await interaction.client.users.fetch(results[i].userId);
+        embed.addFields({
+          name: `${medals[i]} ${user}`,
+          value: `${results[i].count} ${type}s sent`,
+          inline: false
+        });
+      }
     }
 
     await interaction.editReply({ embeds: [embed] });
