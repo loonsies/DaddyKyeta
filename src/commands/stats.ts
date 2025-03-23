@@ -1,9 +1,9 @@
-import { Discord, Slash } from "discordx";
+import { Discord, Slash, SlashOption } from "discordx";
 import { SlashCommandBuilder } from "discord.js";
 import { db } from "../database/database.js";
 import { users, bonkInteractions, boopInteractions, biteInteractions, patInteractions, pokeInteractions, smoochInteractions } from "../database/schema.js";
 import { sql } from "drizzle-orm";
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { CommandInteraction, EmbedBuilder, ApplicationCommandOptionType, User } from "discord.js";
 import { INTERACTION_TYPES, InteractionType, INTERACTION_EMOJIS } from "../data/interactions.js";
 
 const interactionTables = {
@@ -17,15 +17,30 @@ const interactionTables = {
 
 export const command = new SlashCommandBuilder()
   .setName("stats")
-  .setDescription("Show your interaction statistics");
+  .setDescription("Show interaction statistics")
+  .addUserOption(option =>
+    option
+      .setName("target")
+      .setDescription("The user to show stats for (defaults to yourself)")
+      .setRequired(false)
+  );
 
 @Discord()
 export class StatsCommands {
-  @Slash({ description: "Show your interaction statistics" })
-  async stats(interaction: CommandInteraction) {
+  @Slash({ description: "Show interaction statistics" })
+  async stats(
+    @SlashOption({
+      name: "target",
+      description: "The user to show stats for (defaults to yourself)",
+      required: false,
+      type: ApplicationCommandOptionType.User
+    }) target: User | undefined,
+    interaction: CommandInteraction
+  ) {
     await interaction.deferReply();
 
-    const userId = interaction.user.id;
+    const userId = target?.id || interaction.user.id;
+    const targetUser = target || interaction.user;
 
     // Get user's stats
     const userStats = await db.select({
@@ -70,7 +85,7 @@ export class StatsCommands {
 
     // Create embed for the stats
     const embed = new EmbedBuilder()
-      .setTitle(`📊 Statistics for ${interaction.user.username}`)
+      .setTitle(`📊 Statistics for ${targetUser.toString()}`)
       .setColor("#00FF00")
       .setTimestamp();
 
