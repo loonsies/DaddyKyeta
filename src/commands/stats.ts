@@ -70,7 +70,7 @@ export class StatsCommands {
 
     // Create embed for the stats
     const embed = new EmbedBuilder()
-      .setTitle(`📊 Statistics for ${interaction.user.toString()}`)
+      .setTitle(`📊 Statistics for ${interaction.user.username}`)
       .setColor("#00FF00")
       .setTimestamp();
 
