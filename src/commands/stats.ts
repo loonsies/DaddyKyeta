@@ -40,7 +40,7 @@ export class StatsCommands {
     await interaction.deferReply();
 
     const userId = target?.id || interaction.user.id;
-    const targetUser = target || interaction.user;
+    const targetUser = await interaction.client.users.fetch(userId);
 
     // Get user's stats
     const userStats = await db.select({
