@@ -85,7 +85,7 @@ export class StatsCommands {
 
     // Create embed for the stats
     const embed = new EmbedBuilder()
-      .setTitle(`📊 Statistics for ${targetUser.toString()}`)
+      .setTitle(`📊 Statistics for ${targetUser.username}`)
       .setColor("#00FF00")
       .setTimestamp();
 
