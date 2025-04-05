@@ -13,6 +13,7 @@ export class AdmissionCommands {
     defaultMemberPermissions: ["Administrator"]
   })
   async addadmissionmessage(interaction: CommandInteraction) {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const channel = interaction.channel as TextChannel;
     await channel.send({
       content: "Welcome to the Wrath FC discord server! ✨\nOnly members and FC Friends are allowed here.\nInto which category would you fit into?",
@@ -32,9 +33,8 @@ export class AdmissionCommands {
       ],
     });
 
-    await interaction.reply({
-      content: "Admission message created!",
-      flags: MessageFlags.Ephemeral,
+    await interaction.editReply({
+      content: "Admission message created!"
     });
   }
 

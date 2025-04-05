@@ -13,6 +13,7 @@ export class BirthdayCommands {
     defaultMemberPermissions: ["Administrator"]
   })
   async addbirthdaybutton(interaction: CommandInteraction) {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const channel = interaction.channel as TextChannel;
     await channel.send({
       content: "To set your birthday, we need to know your birthday and timezone.\nIf you're unsure about your timezone, you can find it here : https://zones.arilyn.cc\n\nClick this button to set your birthday 🎂 :",
@@ -26,10 +27,8 @@ export class BirthdayCommands {
       ],
     });
 
-    // Acknowledge the command silently
-    await interaction.reply({
-      content: "Birthday button created!",
-      flags: MessageFlags.Ephemeral,
+    await interaction.editReply({
+      content: "Birthday button created!"
     });
   }
 
@@ -84,7 +83,7 @@ export class BirthdayCommands {
     if (!DateTime.local().setZone(timezone).isValid) {
       await interaction.reply({
         content: "Invalid timezone. Please use a valid timezone identifier (e.g., Europe/Paris, America/New_York).",
-        flags: MessageFlags.Ephemeral,
+        flags: 1 << 6
       });
       return;
     }
@@ -95,7 +94,7 @@ export class BirthdayCommands {
     if (!match) {
       await interaction.reply({
         content: "Invalid date format. Please use DD/MM/YYYY format.",
-        flags: MessageFlags.Ephemeral,
+        flags: 1 << 6
       });
       return;
     }
@@ -107,7 +106,7 @@ export class BirthdayCommands {
     if (!hourStr.match(hourRegex)) {
       await interaction.reply({
         content: "Invalid hour format. Please use HH:MM format (24h), e.g., 04:00 or 14:30",
-        flags: MessageFlags.Ephemeral,
+        flags: 1 << 6
       });
       return;
     }
@@ -123,7 +122,7 @@ export class BirthdayCommands {
     if (!userDateTime.isValid || userDateTime > DateTime.now()) {
       await interaction.reply({
         content: "Please enter a valid date that is not in the future.",
-        flags: MessageFlags.Ephemeral,
+        flags: 1 << 6
       });
       return;
     }
@@ -145,7 +144,7 @@ export class BirthdayCommands {
     await interaction.reply({
       content: `${preview}\nIs this correct?`,
       components: [new ActionRowBuilder<ButtonBuilder>().addComponents(confirmButton, cancelButton)],
-      flags: MessageFlags.Ephemeral,
+      flags: 1 << 6
     });
   }
 
@@ -203,6 +202,7 @@ export class BirthdayCommands {
 
   @Slash({ description: "View your saved birthday" })
   async viewbirthday(interaction: CommandInteraction) {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     try {
       // Get user's birthday from database
       const userProfile = await db
@@ -212,9 +212,8 @@ export class BirthdayCommands {
         .limit(1);
 
       if (!userProfile.length) {
-        await interaction.reply({
-          content: "You haven't set your birthday yet! Use the birthday setup button to set it.",
-          flags: MessageFlags.Ephemeral
+        await interaction.editReply({
+          content: "You haven't set your birthday yet! Use the birthday setup button to set it!"
         });
         return;
       }
@@ -232,15 +231,13 @@ export class BirthdayCommands {
       }
 
       const timestamp = Math.floor(birthday.toSeconds());
-      await interaction.reply({
-        content: `Your birthday is set to: <t:${timestamp}:F>\nTimezone: ${profile.timezone}`,
-        flags: MessageFlags.Ephemeral
+      await interaction.editReply({
+        content: `Your birthday is set to: <t:${timestamp}:F>\nTimezone: ${profile.timezone}`
       });
     } catch (error) {
       console.error('Error fetching birthday:', error);
-      await interaction.reply({
-        content: "Sorry, there was an error fetching your birthday.",
-        flags: MessageFlags.Ephemeral
+      await interaction.editReply({
+        content: "Sorry, there was an error fetching your birthday."
       });
     }
   }
@@ -289,7 +286,7 @@ export class BirthdayCommands {
       if (!DateTime.local().setZone(timezoneStr).isValid) {
         await interaction.reply({
           content: "Invalid timezone. Please use a valid timezone identifier (e.g., Europe/Paris, America/New_York).",
-          flags: MessageFlags.Ephemeral,
+          flags: 1 << 6
         });
         return;
       }
@@ -300,7 +297,7 @@ export class BirthdayCommands {
       if (!match) {
         await interaction.reply({
           content: "Invalid date format. Please use DD/MM/YYYY format.",
-          flags: MessageFlags.Ephemeral,
+          flags: 1 << 6
         });
         return;
       }
@@ -312,7 +309,7 @@ export class BirthdayCommands {
       if (!hourStr.match(hourRegex)) {
         await interaction.reply({
           content: "Invalid hour format. Please use HH:MM format (24h), e.g., 04:00 or 14:30",
-          flags: MessageFlags.Ephemeral,
+          flags: 1 << 6
         });
         return;
       }
@@ -328,7 +325,7 @@ export class BirthdayCommands {
       if (!userDateTime.isValid || userDateTime > DateTime.now()) {
         await interaction.reply({
           content: "Please enter a valid date that is not in the future.",
-          flags: MessageFlags.Ephemeral,
+          flags: 1 << 6
         });
         return;
       }
@@ -351,13 +348,13 @@ export class BirthdayCommands {
 
       await interaction.reply({
         content: `Timezone for <@${user.id}> has been set to: ${timezoneStr} ✨`,
-        flags: MessageFlags.Ephemeral,
+        flags: 1 << 6
       });
     } catch (error) {
       console.error('Error setting timezone:', error);
       await interaction.reply({
         content: "Sorry, there was an error setting the timezone. Please try again later.",
-        flags: MessageFlags.Ephemeral,
+        flags: 1 << 6
       });
     }
   }
@@ -386,7 +383,7 @@ export class BirthdayCommands {
       if (!userProfile.length) {
         await interaction.reply({
           content: `<@${user.id}> hasn't set their birthday yet.`,
-          flags: MessageFlags.Ephemeral
+          flags: 1 << 6
         });
         return;
       }
@@ -406,13 +403,13 @@ export class BirthdayCommands {
       const timestamp = Math.floor(birthday.toSeconds());
       await interaction.reply({
         content: `Birthday for <@${user.id}>:\nDate: <t:${timestamp}:F>\nTimezone: ${profile.timezone}`,
-        flags: MessageFlags.Ephemeral
+        flags: 1 << 6
       });
     } catch (error) {
       console.error('Error fetching birthday:', error);
       await interaction.reply({
         content: "Sorry, there was an error fetching the birthday information.",
-        flags: MessageFlags.Ephemeral
+        flags: 1 << 6
       });
     }
   }

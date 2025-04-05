@@ -15,6 +15,7 @@ export class TimezoneCommands {
     defaultMemberPermissions: ["Administrator"]
   })
   async addtimezonebutton(interaction: CommandInteraction) {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const channel = interaction.channel as TextChannel;
     await channel.send({
       content: "To set your timezone, click the button below.\nIf you're unsure about your timezone, you can find it here : https://zones.arilyn.cc\nClick this button to set your timezone 🕑 :",
@@ -28,9 +29,8 @@ export class TimezoneCommands {
       ],
     });
 
-    await interaction.reply({
-      content: "Timezone button created!",
-      flags: MessageFlags.Ephemeral,
+    await interaction.editReply({
+      content: "Timezone button created!"
     });
   }
 
