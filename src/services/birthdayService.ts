@@ -3,9 +3,9 @@ import { DateTime } from "luxon";
 import { db } from "../database/database.js";
 import { users } from "../database/schema.js";
 import { and, eq, isNotNull } from "drizzle-orm";
-import PgBoss from 'pg-boss';
+import PgBoss from "pg-boss";
 
-const BIRTHDAY_QUEUE = 'birthday-notifications';
+const BIRTHDAY_QUEUE = "birthday-notifications";
 
 export class BirthdayService {
   private client: Client;
@@ -13,47 +13,56 @@ export class BirthdayService {
 
   constructor(client: Client) {
     this.client = client;
-    
+
     // Initialize PgBoss with the same database connection
-    this.boss = new PgBoss(process.env.DATABASE_URL || '');
-    
+    this.boss = new PgBoss(process.env.DATABASE_URL || "");
+
     // Handle errors
-    this.boss.on('error', (error: Error) => console.error('PgBoss error:', error));
+    this.boss.on("error", (error: Error) => console.error("PgBoss error:", error));
   }
 
   async start() {
     try {
       // Start the job queue
       await this.boss.start();
-      
+
       // Create the queues first
       await this.boss.createQueue(BIRTHDAY_QUEUE);
-      await this.boss.createQueue('birthday-check');
+      await this.boss.createQueue("birthday-check");
 
       // Schedule all birthdays first
       await this.scheduleBirthdays();
-      
+
       // Then set up handlers
-      await this.boss.work<{userId: string}>(BIRTHDAY_QUEUE, async (jobs) => {
+      await this.boss.work<{ userId: string }>(BIRTHDAY_QUEUE, async (jobs) => {
         for (const job of jobs) {
-          if (job.data?.userId) {
-            await this.sendBirthdayMessage(job.data.userId);
-            await this.scheduleUserBirthday(job.data.userId);
+          try {
+            if (job.data?.userId) {
+              await this.sendBirthdayMessage(job.data.userId);
+              await this.scheduleUserBirthday(job.data.userId);
+            }
+          } catch (err) {
+            console.error(`Birthday job for ${job.data?.userId} failed:`, err);
           }
         }
+        return true;
       });
 
       // Add handler for birthday-check
-      await this.boss.work('birthday-check', async () => {
+      await this.boss.work("birthday-check", async () => {
         await this.scheduleBirthdays();
       });
 
       // Schedule daily check
-      await this.boss.schedule('birthday-check', '0 0 * * *', {}, {
-        retryLimit: 3,
-        retryBackoff: true
-      });
-
+      await this.boss.schedule(
+        "birthday-check",
+        "0 0 * * *",
+        {},
+        {
+          retryLimit: 3,
+          retryBackoff: true,
+        },
+      );
     } catch (error) {
       console.error("Error starting birthday service:", error);
     }
@@ -72,10 +81,7 @@ export class BirthdayService {
           birthday: users.birthday,
         })
         .from(users)
-        .where(and(
-          isNotNull(users.birthday),
-          isNotNull(users.timezone)
-        ));
+        .where(and(isNotNull(users.birthday), isNotNull(users.timezone)));
 
       for (const user of birthdayUsers) {
         await this.scheduleUserBirthday(user.userId);
@@ -96,25 +102,24 @@ export class BirthdayService {
           birthday: users.birthday,
         })
         .from(users)
-        .where(and(
-          isNotNull(users.birthday),
-          isNotNull(users.timezone),
-          eq(users.userId, userId)
-        ))
-        .then(rows => rows[0]);
+        .where(and(isNotNull(users.birthday), isNotNull(users.timezone), eq(users.userId, userId)))
+        .then((rows) => rows[0]);
 
       if (!userInfo?.birthday || !userInfo?.timezone) return;
 
       // Calculate next birthday
       const userBirthday = DateTime.fromJSDate(userInfo.birthday).setZone(userInfo.timezone);
       const now = DateTime.now().setZone(userInfo.timezone);
-      let nextBirthday = DateTime.fromObject({
-        year: now.year,
-        month: userBirthday.month,
-        day: userBirthday.day,
-        hour: userBirthday.hour,
-        minute: userBirthday.minute,
-      }, { zone: userInfo.timezone });
+      let nextBirthday = DateTime.fromObject(
+        {
+          year: now.year,
+          month: userBirthday.month,
+          day: userBirthday.day,
+          hour: userBirthday.hour,
+          minute: userBirthday.minute,
+        },
+        { zone: userInfo.timezone },
+      );
 
       // If birthday has passed this year, schedule for next year
       if (nextBirthday < now) {
@@ -129,8 +134,8 @@ export class BirthdayService {
           retryLimit: 3,
           retryBackoff: true,
           singletonKey: `birthday-${userId}`,
-          startAfter: nextBirthday.toJSDate()
-        }
+          startAfter: nextBirthday.toJSDate(),
+        },
       );
 
       // Debug message when scheduling birthday
@@ -144,7 +149,6 @@ export class BirthdayService {
       //    });
       //  }
       //}
-
     } catch (error) {
       console.error(`Error scheduling birthday for user ${userId}:`, error);
     }
@@ -169,4 +173,4 @@ export class BirthdayService {
       console.error("Error sending birthday message:", error);
     }
   }
-} 
+}
