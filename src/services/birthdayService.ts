@@ -26,10 +26,10 @@ export class BirthdayService {
       // Start the job queue
       await this.boss.start();
 
-  // Create or update the birthday queue to ensure correct policy
-  await this.boss.createQueue(BIRTHDAY_QUEUE, { name: BIRTHDAY_QUEUE, policy: 'stately' });
-  await this.boss.updateQueue(BIRTHDAY_QUEUE, { policy: 'stately' });
-  await this.boss.createQueue("birthday-check");
+      // Create or update the birthday queue to ensure correct policy
+      await this.boss.createQueue(BIRTHDAY_QUEUE, { name: BIRTHDAY_QUEUE, policy: 'stately' });
+      await this.boss.updateQueue(BIRTHDAY_QUEUE, { name: BIRTHDAY_QUEUE, policy: 'stately' });
+      await this.boss.createQueue("birthday-check");
 
       // Schedule all birthdays first
       await this.scheduleBirthdays();
