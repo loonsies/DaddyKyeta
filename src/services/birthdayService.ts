@@ -27,7 +27,7 @@ export class BirthdayService {
       await this.boss.start();
 
       // Create the queues first
-  await this.boss.createQueue(BIRTHDAY_QUEUE, { policy: 'stately' });
+  await this.boss.createQueue(BIRTHDAY_QUEUE, { name: BIRTHDAY_QUEUE, policy: 'stately' });
       await this.boss.createQueue("birthday-check");
 
       // Schedule all birthdays first
@@ -123,17 +123,16 @@ export class BirthdayService {
         nextBirthday = nextBirthday.plus({ years: 1 });
       }
 
-      await this.boss.send(
-        BIRTHDAY_QUEUE,
-        { userId },
-        {
-          retryLimit: 3,
-          retryBackoff: true,
-          singletonKey: `birthday-${userId}`,
-          startAfter: nextBirthday.toJSDate(),
-          useSingletonQueue: true,
-        },
-      );
+        await this.boss.send(
+          BIRTHDAY_QUEUE,
+          { userId },
+          {
+            retryLimit: 3,
+            retryBackoff: true,
+            singletonKey: `birthday-${userId}`,
+            startAfter: nextBirthday.toJSDate(),
+          },
+        );
 
       // Debug message when scheduling birthday
       //const channelId = process.env.CHAT_CHANNEL_ID;
