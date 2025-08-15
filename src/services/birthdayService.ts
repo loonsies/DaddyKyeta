@@ -132,6 +132,7 @@ export class BirthdayService {
           retryBackoff: true,
           singletonKey: `birthday-${userId}`,
           startAfter: nextBirthday.toJSDate(),
+          policy: 'short',
         },
       );
 
