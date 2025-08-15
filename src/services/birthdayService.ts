@@ -93,8 +93,8 @@ export class BirthdayService {
 
   private async scheduleUserBirthday(userId: string) {
     try {
-      // Cancel any existing birthday jobs for this user first
-      await this.boss.cancelJobs(BIRTHDAY_QUEUE, { singletonKey: `birthday-${userId}` });
+  // Delete any existing birthday jobs for this user first
+  await this.boss.deleteJobs({ queue: BIRTHDAY_QUEUE, singletonKey: `birthday-${userId}` });
 
       const userInfo = await db
         .select({
