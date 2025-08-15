@@ -123,18 +123,17 @@ export class BirthdayService {
         nextBirthday = nextBirthday.plus({ years: 1 });
       }
 
-      // Schedule the birthday notification using send for one-time jobs
-      await this.boss.send(
-        BIRTHDAY_QUEUE,
-        { userId },
-        {
-          retryLimit: 3,
-          retryBackoff: true,
-          singletonKey: `birthday-${userId}`,
-          startAfter: nextBirthday.toJSDate(),
-          policy: 'short',
-        },
-      );
+        await this.boss.send(
+          BIRTHDAY_QUEUE,
+          { userId },
+          {
+            retryLimit: 3,
+            retryBackoff: true,
+            singletonKey: `birthday-${userId}`,
+            startAfter: nextBirthday.toJSDate(),
+            useSingletonQueue: true,
+          },
+        );
 
       // Debug message when scheduling birthday
       //const channelId = process.env.CHAT_CHANNEL_ID;
